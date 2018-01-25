@@ -60,4 +60,5 @@ public enum NetworkType {
  上面内容来自[这里](https://github.com/evernote/android-job/wiki/FAQ)
  
  问题：尽管我设置了要求网络连接，为什么我的job在没网的情况下运行？
+ 
  回答的大致就是，到时间就运行，这是预期的，对于是否运行job,时间这个节点设置比网络类型更重要，如果说你要求所有的执行按照你的设置进行，那么设置.setRequirementsEnforced(true)
