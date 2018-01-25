@@ -42,7 +42,7 @@ public enum NetworkType {
         METERED
     }
 ```
-#### setRequirementsEnforced(true)
+### setRequirementsEnforced(true)
 
 ##### Why does my job run while the device is offline, although I've requested a network connection?
  
@@ -63,7 +63,7 @@ public enum NetworkType {
  
  回答的大致就是，到时间就运行，这是预期的，对于是否运行job,时间这个节点设置比网络类型更重要，如果说你要求所有的执行按照你的设置进行，那么设置.setRequirementsEnforced(true)
  
- #### setPeriodic(long intervalMs, long flexMs)
+ ### setPeriodic(long intervalMs, long flexMs)
  Why can't an interval be smaller than 15 minutes for periodic jobs?
  
  This library is a subset of 3 different APIs. Since Android Nougat the minimum interval of periodic jobs is 15 minutes. Although pre Nougat devices support smaller intervals, the least common was chosen as minimum for this library so that periodic jobs run with the same frequency on all devices.
