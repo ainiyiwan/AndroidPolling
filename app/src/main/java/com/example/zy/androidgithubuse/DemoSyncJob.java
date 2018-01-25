@@ -12,7 +12,10 @@ import android.support.v4.app.NotificationCompat;
 import android.support.v4.app.NotificationManagerCompat;
 
 import com.evernote.android.job.Job;
+import com.evernote.android.job.JobRequest;
 import com.evernote.android.job.demo.R;
+import com.evernote.android.job.util.support.PersistableBundleCompat;
+import com.orhanobut.logger.Logger;
 
 import java.util.Random;
 
@@ -27,7 +30,7 @@ public class DemoSyncJob extends Job {
     @NonNull
     protected Result onRunJob(@NonNull final Params params) {
         boolean success = new DemoSyncEngine(getContext()).sync();
-
+        Logger.d("DemoSyncJob.onRunJob() 执行DemoSyncJob的onRunJob方法\n"+"时间："+DateUtil.getDateToString());
         PendingIntent pendingIntent = PendingIntent.getActivity(getContext(), 0, new Intent(getContext(), MainActivity.class), 0);
 
         if (Build.VERSION.SDK_INT >= Build.VERSION_CODES.O) {
@@ -51,6 +54,34 @@ public class DemoSyncJob extends Job {
 
         NotificationManagerCompat.from(getContext()).notify(new Random().nextInt(), notification);
 
+        Logger.d("DemoSyncJob.onRunJob() 执行DemoSyncJob的onRunJob方法成功？=== "+success+"\n"+"时间："+DateUtil.getDateToString());
+
+        Logger.d("DemoSyncJob.onRunJob() 下一轮结束喽--------------\n"+"时间："+DateUtil.getDateToString());
+
+        Logger.d("DemoSyncJob.onRunJob() 下一轮开始喽++++++++++++++\n"+"时间："+DateUtil.getDateToString());
+
         return success ? Result.SUCCESS : Result.FAILURE;
+    }
+
+    private void testSimple() {
+        PersistableBundleCompat extras = new PersistableBundleCompat();
+        extras.putString("key", "Hello world");
+
+        int mLastJobId = new JobRequest.Builder(DemoSyncJob.TAG)
+                //设置展示时间3-4秒，
+                .setExecutionWindow(3_000L, 4_000L)
+                //设置失败重试时间，默认30s,backoff = numFailures * initial_backoff.线性增长
+                .setBackoffCriteria(5_000L, JobRequest.BackoffPolicy.LINEAR)
+                //设置任务执行时是否要求充电状态
+                .setRequiresCharging(false)
+                //手机是否处于闲置状态，这时候可以进行比较繁重任务，默认false
+                .setRequiresDeviceIdle(false)
+                //要求网络类型
+                .setRequiredNetworkType(JobRequest.NetworkType.ANY)
+                .setExtras(extras)
+                .setRequirementsEnforced(true)
+                .build()
+                .schedule();
+        Logger.d("testSimple() 执行DemoSyncJob的testSimple()方法\n"+"时间："+DateUtil.getDateToString());
     }
 }

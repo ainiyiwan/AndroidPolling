@@ -18,6 +18,9 @@ import com.evernote.android.job.JobManager;
 import com.evernote.android.job.JobRequest;
 import com.evernote.android.job.demo.R;
 import com.evernote.android.job.util.support.PersistableBundleCompat;
+import com.orhanobut.logger.Logger;
+
+import java.util.concurrent.TimeUnit;
 
 /**
  * @author rwondratschek
@@ -34,6 +37,7 @@ public class MainActivity extends Activity {
 
     private JobManager mJobManager;
 
+    //have seen
     @Override
     protected void onCreate(Bundle savedInstanceState) {
         super.onCreate(savedInstanceState);
@@ -41,19 +45,23 @@ public class MainActivity extends Activity {
 
         mJobManager = JobManager.instance();
 
+        //have seen
         if (savedInstanceState != null) {
             mLastJobId = savedInstanceState.getInt(LAST_JOB_ID, 0);
         }
 
+        //have seen
         CompoundButton enableGcm = findViewById(R.id.enable_gcm);
         mRequiresCharging = findViewById(R.id.check_requires_charging);
         mRequiresDeviceIdle = findViewById(R.id.check_requires_device_idle);
         mNetworkTypeSpinner = findViewById(R.id.spinner_network_type);
 
+        //have seen
         ArrayAdapter<String> adapter = new ArrayAdapter<>(this, android.R.layout.simple_spinner_item, getNetworkTypesAsString());
         adapter.setDropDownViewResource(android.R.layout.simple_spinner_dropdown_item);
         mNetworkTypeSpinner.setAdapter(adapter);
 
+        //have seen
         enableGcm.setChecked(JobConfig.isApiEnabled(JobApi.GCM));
         enableGcm.setEnabled(JobApi.GCM.isSupported(this));
         enableGcm.setOnCheckedChangeListener(new CompoundButton.OnCheckedChangeListener() {
@@ -64,18 +72,21 @@ public class MainActivity extends Activity {
         });
     }
 
+    //have seen
     @Override
     protected void onSaveInstanceState(@NonNull Bundle outState) {
         super.onSaveInstanceState(outState);
         outState.putInt(LAST_JOB_ID, mLastJobId);
     }
 
+    //have seen
     @Override
     public boolean onCreateOptionsMenu(Menu menu) {
         getMenuInflater().inflate(R.menu.activity_main, menu);
         return true;
     }
 
+    //have seen
     @Override
     public boolean onPrepareOptionsMenu(Menu menu) {
         super.onPrepareOptionsMenu(menu);
@@ -137,6 +148,7 @@ public class MainActivity extends Activity {
         return true;
     }
 
+    //have seen
     @Override
     public boolean onOptionsItemSelected(MenuItem item) {
         switch (item.getItemId()) {
@@ -163,6 +175,7 @@ public class MainActivity extends Activity {
         }
     }
 
+    //have seen
     public void onClick(View view) {
         switch (view.getId()) {
             case R.id.button_simple:
@@ -200,15 +213,21 @@ public class MainActivity extends Activity {
         extras.putString("key", "Hello world");
 
         mLastJobId = new JobRequest.Builder(DemoSyncJob.TAG)
+                //设置展示时间3-4秒，
                 .setExecutionWindow(3_000L, 4_000L)
+                //设置失败重试时间，默认30s,backoff = numFailures * initial_backoff.线性增长
                 .setBackoffCriteria(5_000L, JobRequest.BackoffPolicy.LINEAR)
+                //设置任务执行时是否要求充电状态
                 .setRequiresCharging(mRequiresCharging.isChecked())
+                //手机是否处于闲置状态，这时候可以进行比较繁重任务，默认false
                 .setRequiresDeviceIdle(mRequiresDeviceIdle.isChecked())
+                //要求网络类型
                 .setRequiredNetworkType(JobRequest.NetworkType.values()[mNetworkTypeSpinner.getSelectedItemPosition()])
                 .setExtras(extras)
                 .setRequirementsEnforced(true)
                 .build()
                 .schedule();
+        Logger.d("testSimple() 执行MainActivity的testSimple()方法\n"+"时间："+DateUtil.getDateToString());
     }
 
     private void testAllImpl() {
@@ -217,6 +236,7 @@ public class MainActivity extends Activity {
                 JobConfig.forceApi(api);
                 testSimple();
             } else {
+                Logger.t("testAllImpl").d("testAllImpl() testAllImpl()方法\n"+"时间："+DateUtil.getDateToString()+"\n===========================\n"+String.format("%s is not supported", api));
                 Log.w("Demo", String.format("%s is not supported", api));
             }
         }
@@ -225,13 +245,17 @@ public class MainActivity extends Activity {
     }
 
     private void testPeriodic() {
+        JobConfig.setAllowSmallerIntervalsForMarshmallow(true);
+        Logger.d("时间间隔===="+TimeUnit.SECONDS.toMillis(10));
+        Logger.d("testPeriodic() 执行MainActivity的testPeriodic()方法\n"+"时间："+DateUtil.getDateToString());
         mLastJobId = new JobRequest.Builder(DemoSyncJob.TAG)
-                .setPeriodic(JobRequest.MIN_INTERVAL, JobRequest.MIN_FLEX)
+                .setPeriodic(TimeUnit.SECONDS.toMillis(60), TimeUnit.SECONDS.toMillis(30))
                 .setRequiresCharging(mRequiresCharging.isChecked())
                 .setRequiresDeviceIdle(mRequiresDeviceIdle.isChecked())
                 .setRequiredNetworkType(JobRequest.NetworkType.values()[mNetworkTypeSpinner.getSelectedItemPosition()])
                 .build()
                 .schedule();
+
     }
 
     private void testExact() {
@@ -254,6 +278,7 @@ public class MainActivity extends Activity {
         mJobManager.cancelAll();
     }
 
+    //have seen
     private String[] getNetworkTypesAsString() {
         String[] result = new String[JobRequest.NetworkType.values().length];
         for (int i = 0; i < JobRequest.NetworkType.values().length; i++) {
@@ -261,4 +286,10 @@ public class MainActivity extends Activity {
         }
         return result;
     }
+
+//    @Override
+//    protected void onDestroy() {
+//        super.onDestroy();
+//        testCancelAll();
+//    }
 }

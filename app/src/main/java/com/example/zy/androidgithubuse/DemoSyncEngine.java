@@ -8,6 +8,8 @@ import android.support.annotation.NonNull;
 import android.support.annotation.WorkerThread;
 import android.util.Log;
 
+import com.orhanobut.logger.Logger;
+
 import java.io.File;
 import java.io.IOException;
 import java.text.SimpleDateFormat;
@@ -30,7 +32,7 @@ public class DemoSyncEngine {
     @WorkerThread
     public boolean sync() {
         // do something fancy
-
+        Logger.d("DemoSyncEngine.sync() 执行DemoSyncEngine的sync方法\n"+"时间："+DateUtil.getDateToString());
         if (Looper.myLooper() == Looper.getMainLooper()) {
             throw new NetworkOnMainThreadException();
         }

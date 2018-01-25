@@ -62,3 +62,13 @@ public enum NetworkType {
  问题：尽管我设置了要求网络连接，为什么我的job在没网的情况下运行？
  
  回答的大致就是，到时间就运行，这是预期的，对于是否运行job,时间这个节点设置比网络类型更重要，如果说你要求所有的执行按照你的设置进行，那么设置.setRequirementsEnforced(true)
+ 
+ #### setPeriodic(long intervalMs, long flexMs)
+ Why can't an interval be smaller than 15 minutes for periodic jobs?
+ 
+ This library is a subset of 3 different APIs. Since Android Nougat the minimum interval of periodic jobs is 15 minutes. Although pre Nougat devices support smaller intervals, the least common was chosen as minimum for this library so that periodic jobs run with the same frequency on all devices.
+ 
+ The JobScheduler with Android Nougat allows setting a smaller interval, but the value is silently adjusted and a warning is being logged. This library throws an exception instead, so that misbehaving jobs are caught early. You can read more about it here.
+ 
+ 有一点不好就是如果做轮询的话，最小间隔只能是15分钟，虽然6.0及其以前可以设置1分钟，但是这个兼容性确实不好，所以，如果你的项目要求轮询时间大于15分钟的话，那你就大胆的使用这个库，小于15分钟的话，另寻他法吧。
+ ##完结
